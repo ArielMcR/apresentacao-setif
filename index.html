@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apresentação do Kroma</title>
+<style>
+@font-face { font-family: "Oswald"; src: url("fonts/oswald-var.woff2") format("woff2"); font-weight: 200 700; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("fonts/barlow-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("fonts/barlow-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Barlow"; src: url("fonts/barlow-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("fonts/plexmono-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+
+:root {
+  /* Layout: 16:9 stage of 1600x900 design units, left-aligned grid; condensed uppercase headings echo the Kroma app header; app screens framed as devices. */
+  --paper: #F5F2EC;
+  --card: #FFFFFF;
+  --ink: #201A14;
+  --ink-2: #5C5248;
+  --line: #E2DACE;
+  --copper: #A2652B;
+  --copper-ink: #7E4A1B;
+  --copper-wash: #F2E5D6;
+  --letterbox: #1A1511;
+  /* chart-only categorical slots (validated: light, surface #FFFFFF) */
+  --c-ok: #A2652B;
+  --c-interp: #2D6FB0;
+  --c-ext: #A08A1E;
+
+  --display: "Oswald", "Bahnschrift Condensed", "Arial Narrow", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--letterbox);
+  color: var(--ink);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Stage ---------- */
+.deck { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; }
+.slide {
+  grid-area: 1 / 1;
+  width: min(100vw, calc(100vh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  background: var(--paper);
+  container-type: inline-size;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility 0s linear .25s;
+  position: relative;
+}
+.slide.is-active { opacity: 1; visibility: visible; transition: opacity .25s ease; }
+
+.frame {
+  --u: calc(100cqw / 1600);
+  --fs-hero: calc(var(--u) * 190);
+  --fs-h: calc(var(--u) * 58);
+  --fs-lead: calc(var(--u) * 30);
+  --fs-body: calc(var(--u) * 25);
+  --fs-small: max(12px, calc(var(--u) * 19));
+  --fs-eyebrow: max(11px, calc(var(--u) * 18));
+  --fs-stat: calc(var(--u) * 76);
+  --pad-x: calc(var(--u) * 88);
+  --pad-y: calc(var(--u) * 64);
+  --gap: calc(var(--u) * 40);
+  position: absolute;
+  inset: 0;
+  padding: var(--pad-y) var(--pad-x);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: calc(var(--u) * 28);
+  font-size: var(--fs-body);
+  line-height: 1.35;
+}
+
+/* ---------- Type ---------- */
+.eyebrow {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: var(--fs-eyebrow);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--copper-ink);
+  margin: 0 0 calc(var(--u) * 10);
+}
+h1, h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .01em;
+  line-height: 1.05;
+  margin: 0;
+  text-wrap: balance;
+}
+h2 { font-size: var(--fs-h); max-width: 46ch; }
+h3 {
+  font-family: var(--display);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: calc(var(--u) * 24);
+  margin: 0 0 calc(var(--u) * 12);
+  color: var(--ink);
+}
+p { margin: 0; }
+.lead { font-size: var(--fs-lead); color: var(--ink-2); max-width: 52ch; }
+.small { font-size: var(--fs-small); color: var(--ink-2); }
+.mono { font-family: var(--mono); font-weight: 500; letter-spacing: -.01em; }
+.foot {
+  display: flex; justify-content: space-between; gap: var(--gap);
+  font-size: var(--fs-small); color: var(--ink-2);
+  border-top: 1px solid var(--line);
+  padding-top: calc(var(--u) * 14);
+}
+a { color: var(--copper-ink); text-underline-offset: .15em; }
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--copper); outline-offset: 3px; border-radius: 4px; }
+
+ul.list { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--u) * 18); }
+ul.list li { padding-left: calc(var(--u) * 26); position: relative; }
+ul.list li::before {
+  content: ""; position: absolute; left: 0; top: .55em;
+  width: calc(var(--u) * 10); height: calc(var(--u) * 10);
+  background: var(--copper); border-radius: 2px;
+}
+
+/* ---------- Device frame ---------- */
+.phone {
+  margin: 0;
+  display: grid; gap: calc(var(--u) * 12); justify-items: center; align-content: start;
+}
+.phone img {
+  display: block;
+  height: var(--ph, calc(var(--u) * 600));
+  width: auto;
+  max-width: 100%;
+  aspect-ratio: 600 / 1219;
+  border: calc(var(--u) * 7) solid var(--ink);
+  border-radius: calc(var(--u) * 36);
+  box-shadow: 0 calc(var(--u) * 22) calc(var(--u) * 44) rgba(70, 45, 20, .18);
+  background: var(--card);
+}
+.phone figcaption { font-size: var(--fs-small); color: var(--ink-2); text-align: center; max-width: 22ch; }
+
+/* ---------- Cards and stats ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--u) * 14);
+  padding: calc(var(--u) * 26) calc(var(--u) * 28);
+}
+.stat-label { font-size: var(--fs-small); color: var(--ink-2); margin-bottom: calc(var(--u) * 6); }
+.stat-value { font-family: var(--body); font-weight: 600; font-size: var(--fs-stat); line-height: 1; color: var(--ink); }
+.stat-value .unit { font-size: .45em; font-weight: 500; color: var(--ink-2); margin-left: .12em; }
+.stat-note { font-size: var(--fs-small); color: var(--ink-2); margin-top: calc(var(--u) * 10); }
+
+/* ---------- Slide 1: cover ---------- */
+.cover { grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto; column-gap: calc(var(--u) * 60); }
+.cover .top { grid-column: 1; }
+.cover .title-block { align-self: center; display: grid; gap: calc(var(--u) * 26); }
+.cover h1 { font-size: var(--fs-hero); line-height: .9; letter-spacing: .02em; }
+.cover .subtitle { font-family: var(--display); font-weight: 500; text-transform: uppercase; font-size: calc(var(--u) * 40); letter-spacing: .03em; line-height: 1.15; max-width: 24ch; color: var(--ink-2); text-wrap: balance; }
+.cover .rule { width: calc(var(--u) * 120); height: calc(var(--u) * 6); background: var(--copper); border-radius: 2px; }
+.cover .people { display: grid; gap: calc(var(--u) * 4); font-size: var(--fs-lead); }
+.cover .people .small { font-size: var(--fs-body); }
+.cover .phone { grid-row: 1 / -1; grid-column: 2; align-self: center; --ph: calc(var(--u) * 740); }
+.cover .foot { grid-column: 1; }
+.keys { font-size: var(--fs-small); color: var(--ink-2); }
+.keys kbd { font-family: var(--mono); font-size: .9em; border: 1px solid var(--line); background: var(--card); border-radius: 4px; padding: 0 .35em; }
+
+/* ---------- Slide 2: problem ---------- */
+.problem .body { display: grid; grid-template-columns: calc(var(--u) * 640) 1fr; gap: calc(var(--u) * 64); align-items: start; }
+.photo { margin: 0; display: grid; gap: calc(var(--u) * 12); }
+.photo img { width: 100%; height: auto; display: block; border-radius: calc(var(--u) * 10); border: 1px solid var(--line); box-shadow: 0 calc(var(--u) * 14) calc(var(--u) * 30) rgba(70, 45, 20, .14); transform: rotate(-1.2deg); }
+.photo figcaption { font-size: var(--fs-small); color: var(--ink-2); }
+.problem .list { font-size: calc(var(--u) * 27); gap: calc(var(--u) * 22); }
+.callout { margin-top: calc(var(--u) * 30); padding: calc(var(--u) * 20) calc(var(--u) * 26); background: var(--copper-wash); border-left: calc(var(--u) * 6) solid var(--copper); border-radius: 0 calc(var(--u) * 10) calc(var(--u) * 10) 0; font-size: calc(var(--u) * 26); }
+
+/* ---------- Slide 3: plan ---------- */
+.plan .body { display: grid; grid-template-rows: auto 1fr; gap: calc(var(--u) * 34); }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: calc(var(--u) * 22); counter-reset: step; }
+.steps li { counter-increment: step; display: grid; grid-template-rows: auto auto 1fr auto; gap: calc(var(--u) * 10); position: relative; }
+.steps li::before {
+  content: counter(step);
+  font-family: var(--display); font-weight: 600; font-size: calc(var(--u) * 64); line-height: 1; color: var(--copper);
+}
+.steps li:not(:last-child)::after {
+  content: ""; position: absolute; top: calc(var(--u) * 32); left: calc(var(--u) * 58); right: calc(var(--u) * -10);
+  height: 2px; background: var(--line);
+}
+.steps p { font-size: calc(var(--u) * 23); color: var(--ink-2); }
+.steps .result { font-family: var(--mono); font-size: calc(var(--u) * 20); color: var(--copper-ink); border-top: 1px solid var(--line); padding-top: calc(var(--u) * 10); }
+
+/* ---------- Slide 4: system ---------- */
+.system .body { display: grid; grid-template-columns: auto 1fr; gap: calc(var(--u) * 56); align-items: start; }
+.phones { display: grid; grid-template-columns: repeat(3, auto); gap: calc(var(--u) * 30); --ph: calc(var(--u) * 540); }
+.side { display: grid; gap: calc(var(--u) * 26); }
+.side .list { font-size: calc(var(--u) * 23); gap: calc(var(--u) * 12); }
+.tags { display: flex; flex-wrap: wrap; gap: calc(var(--u) * 10); margin: 0; padding: 0; list-style: none; }
+.tags li { font-size: calc(var(--u) * 21); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: calc(var(--u) * 6) calc(var(--u) * 16); }
+
+/* ---------- Slide 5: assistant ---------- */
+.assistant .body { display: grid; grid-template-columns: 1fr auto; gap: calc(var(--u) * 64); align-items: start; }
+.flow { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--u) * 10); counter-reset: f; }
+.flow li {
+  counter-increment: f;
+  display: grid; grid-template-columns: calc(var(--u) * 46) 1fr; gap: calc(var(--u) * 16); align-items: baseline;
+  background: var(--card); border: 1px solid var(--line); border-radius: calc(var(--u) * 12);
+  padding: calc(var(--u) * 14) calc(var(--u) * 20);
+  font-size: calc(var(--u) * 24);
+}
+.flow li::before { content: counter(f); font-family: var(--display); font-weight: 600; font-size: calc(var(--u) * 34); color: var(--copper); line-height: 1; }
+.flow li.key { border-color: var(--copper); box-shadow: inset calc(var(--u) * 6) 0 0 var(--copper); }
+.flow .who { font-weight: 600; }
+.fns { display: grid; grid-template-columns: repeat(2, 1fr); gap: calc(var(--u) * 10) calc(var(--u) * 24); margin: calc(var(--u) * 24) 0 0; padding: 0; list-style: none; }
+.fns li { display: grid; gap: calc(var(--u) * 2); }
+.fns .mono { font-size: calc(var(--u) * 20); color: var(--copper-ink); }
+.fns span:last-child { font-size: var(--fs-small); color: var(--ink-2); }
+.assistant .phone { --ph: calc(var(--u) * 520); }
+.note { font-size: var(--fs-small); color: var(--ink-2); max-width: 110ch; }
+.note strong { color: var(--ink); font-weight: 600; }
+
+/* ---------- Slide 6: results (system) ---------- */
+.res1 .body { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: auto; gap: calc(var(--u) * 20); align-content: start; }
+.res1 .card { padding: calc(var(--u) * 20) calc(var(--u) * 26); }
+.res1 .stat-value { font-size: calc(var(--u) * 64); }
+.res1 .readme { font-size: calc(var(--u) * 23); color: var(--ink); margin-top: calc(var(--u) * 6); }
+.delta { font-size: var(--fs-small); color: var(--ink); margin-top: calc(var(--u) * 10); font-weight: 500; }
+.delta .arrow { color: var(--copper-ink); }
+.section-label { grid-column: 1 / -1; font-family: var(--display); font-weight: 500; text-transform: uppercase; letter-spacing: .12em; font-size: var(--fs-eyebrow); color: var(--ink-2); margin: calc(var(--u) * 8) 0 calc(var(--u) * -6); }
+
+/* ---------- Slide 7: results (assistant) ---------- */
+.res2 .body { display: grid; grid-template-columns: calc(var(--u) * 440) 1fr; gap: calc(var(--u) * 30); align-items: start; }
+.res2 .left { display: grid; gap: calc(var(--u) * 20); }
+.res2 .real { display: grid; align-content: start; gap: calc(var(--u) * 6); }
+.bar-wrap { display: grid; gap: calc(var(--u) * 16); }
+.bar { display: flex; gap: 2px; height: min(28px, calc(var(--u) * 28)); }
+.seg {
+  position: relative; display: flex; align-items: center;
+  padding-left: calc(var(--u) * 10);
+  font-size: min(15px, calc(var(--u) * 17)); font-weight: 600; font-variant-numeric: tabular-nums;
+  border-radius: 4px; cursor: default; outline-offset: 2px;
+}
+.seg.ok { flex: 101; background: var(--c-ok); color: #FFFFFF; }
+.seg.interp { flex: 8; background: var(--c-interp); color: #FFFFFF; }
+.seg.ext { flex: 17; background: var(--c-ext); color: var(--ink); }
+.seg[data-tip]:hover::after, .seg[data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  white-space: nowrap; background: var(--ink); color: #FFFFFF;
+  font-size: max(12px, calc(var(--u) * 17)); font-weight: 500;
+  padding: 6px 10px; border-radius: 6px; z-index: 2; pointer-events: none;
+}
+.legend { display: flex; flex-wrap: wrap; gap: calc(var(--u) * 8) calc(var(--u) * 26); margin: 0; padding: 0; list-style: none; font-size: var(--fs-small); color: var(--ink-2); }
+.legend li { display: flex; align-items: center; gap: calc(var(--u) * 8); }
+.sw { width: calc(var(--u) * 14); height: calc(var(--u) * 14); border-radius: 3px; flex: none; }
+table.data { width: 100%; border-collapse: collapse; font-size: calc(var(--u) * 20); }
+table.data th, table.data td { text-align: left; padding: calc(var(--u) * 5) calc(var(--u) * 10); border-bottom: 1px solid var(--line); }
+table.data th { font-weight: 500; color: var(--ink-2); font-size: var(--fs-small); }
+table.data td.n { text-align: right; font-variant-numeric: tabular-nums; }
+table.data th.n { text-align: right; }
+table.data tr.group td { color: var(--ink-2); }
+table.data tr.group td:first-child { padding-left: calc(var(--u) * 34); }
+table.data tr.total td { font-weight: 600; border-bottom: 0; }
+.takeaways { list-style: none; margin: 0; display: grid; gap: calc(var(--u) * 14); }
+.takeaways li { font-size: calc(var(--u) * 20); color: var(--ink-2); }
+.takeaways strong { font-weight: 600; display: block; font-size: calc(var(--u) * 30); line-height: 1.1; color: var(--ink); }
+.res2 .table-note { font-size: var(--fs-small); color: var(--ink-2); }
+
+/* ---------- Slide 8: conclusion ---------- */
+.end .body { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--u) * 26); align-content: start; }
+.end .card { display: grid; align-content: start; gap: calc(var(--u) * 10); }
+.end .list { font-size: calc(var(--u) * 23); gap: calc(var(--u) * 14); }
+.end .card.done { border-top: calc(var(--u) * 6) solid var(--copper); }
+.end .closing { display: flex; justify-content: space-between; align-items: end; gap: var(--gap); }
+.end .thanks { font-family: var(--display); font-weight: 600; text-transform: uppercase; font-size: calc(var(--u) * 64); line-height: 1; }
+.end .repos { font-size: calc(var(--u) * 22); display: grid; gap: calc(var(--u) * 4); text-align: right; }
+
+/* ---------- HUD ---------- */
+.hud {
+  position: fixed; right: 12px; top: 10px; z-index: 5;
+  display: flex; align-items: center; gap: 6px;
+  font: 500 13px/1 var(--body); color: var(--ink-2);
+  background: rgba(255, 255, 255, .82); border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px 6px 4px 12px;
+  opacity: .5; transition: opacity .2s;
+}
+.hud:hover, .hud:focus-within { opacity: 1; }
+.hud button {
+  font: inherit; color: var(--ink); background: transparent; border: 0; border-radius: 999px;
+  width: 28px; height: 28px; cursor: pointer;
+}
+.hud button:hover { background: var(--copper-wash); }
+.hud .timer { font-variant-numeric: tabular-nums; padding-right: 4px; }
+.hud .timer[hidden] { display: none; }
+.hud .timer.over { color: #A3271F; font-weight: 600; }
+.progress { position: fixed; left: 0; right: 0; bottom: 0; height: 3px; background: var(--copper); transform-origin: 0 50%; transform: scaleX(.125); transition: transform .25s; z-index: 5; }
+
+/* ---------- Stacked modes: overview (O) and narrow screens ---------- */
+body.overview .deck { position: static; display: grid; gap: 24px; padding: 24px; overflow: visible; place-items: start stretch; }
+body.overview .slide { grid-area: auto; width: 100%; max-width: 1600px; margin: 0 auto; opacity: 1; visibility: visible; transition: none; cursor: pointer; }
+body.overview .hud, body.overview .progress { display: none; }
+
+@media (max-width: 760px) {
+  .deck { position: static; display: grid; gap: 16px; padding: 16px; overflow: visible; place-items: start stretch; }
+  .slide { grid-area: auto; width: 100%; aspect-ratio: auto; opacity: 1; visibility: visible; transition: none; }
+  .frame { --u: 0.6px; position: static; padding: 28px 18px; gap: 18px; --fs-hero: 84px; }
+  .hud, .progress, .keys { display: none; }
+  .cover, .problem .body, .system .body, .assistant .body, .res2 .body, .end .body, .res1 .body { grid-template-columns: 1fr; }
+  .cover .phone, .cover .foot { grid-column: auto; grid-row: auto; }
+  .steps, .phones { grid-template-columns: 1fr; }
+  .steps li:not(:last-child)::after { display: none; }
+  .phones { --ph: 420px; }
+  .cover .phone, .assistant .phone { --ph: 420px; }
+  .end .closing { flex-direction: column; align-items: start; }
+  .end .repos { text-align: left; }
+  h2 { font-size: 30px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide, .slide.is-active, .progress, .hud { transition: none; }
+  .photo img { transform: none; }
+}
+@media print {
+  body { background: #FFFFFF; }
+  .deck { position: static; display: block; }
+  .slide { opacity: 1; visibility: visible; width: 100%; break-after: page; }
+  .hud, .progress { display: none; }
+}
+</style>
+</head>
+<body>
+<main class="deck" id="deck" aria-roledescription="apresentação" aria-label="Kroma: sistema de gestão para barbearia com interface em linguagem natural">
+
+  <!-- 1. Capa -->
+  <section class="slide is-active" id="slide-1" aria-roledescription="slide" aria-label="1 de 8: Capa">
+    <div class="frame cover">
+      <p class="eyebrow top">IFPR · Campus Paranavaí · Bacharelado em Engenharia de Software</p>
+      <div class="title-block">
+        <h1>Kroma</h1>
+        <p class="subtitle">Sistema de gestão para barbearia com interface em linguagem natural</p>
+        <div class="rule" aria-hidden="true"></div>
+        <div class="people">
+          <span>Ariel Machado Rodrigues</span>
+          <span class="small">Orientador: Prof. Me. Frank Willian Cardoso de Oliveira</span>
+        </div>
+      </div>
+      <figure class="phone">
+        <img src="img/agenda.jpg" alt="Tela de agendamentos do Kroma com a semana de 10 a 15 de agosto e os horários livres da manhã" width="600" height="1227">
+      </figure>
+      <div class="foot">
+        <span>Resumo expandido · Paranavaí, 2026</span>
+        <span class="keys"><kbd>→</kbd> avançar · <kbd>F</kbd> tela cheia · <kbd>T</kbd> cronômetro · <kbd>O</kbd> visão geral</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Por que -->
+  <section class="slide" id="slide-2" aria-roledescription="slide" aria-label="2 de 8: Por que fazer">
+    <div class="frame problem">
+      <header>
+        <p class="eyebrow">01 · Por que fazer</p>
+        <h2>A barbearia era gerida no caderno e no WhatsApp</h2>
+      </header>
+      <div class="body">
+        <figure class="photo">
+          <img src="img/caderno.jpg" alt="Página de caderno com o faturamento de cada dia da semana de fevereiro somado à mão, total de 10.595 reais" width="720" height="562">
+          <figcaption>Faturamento de fevereiro de 2026, somado à mão no caderno do estabelecimento.</figcaption>
+        </figure>
+        <div>
+          <ul class="list">
+            <li>Agendamentos de sexta e sábado anotados no bloco de notas do celular.</li>
+            <li>Contato e histórico dos clientes só nas conversas do WhatsApp e do Instagram.</li>
+            <li>Dois clientes marcados no mesmo horário cerca de cinco vezes, segundo o dono.</li>
+            <li>O barbeiro trabalha sozinho, com as mãos ocupadas quase o dia todo, e só responde aos pedidos de horário no almoço ou ao fechar.</li>
+          </ul>
+          <p class="callout">Por isso, além dos formulários, o sistema aceita pedidos por texto ou voz.</p>
+        </div>
+      </div>
+      <div class="foot">
+        <span>Estudo de caso em uma barbearia de Paranavaí (PR). O setor de beleza reúne mais de 1 milhão de MEIs no Brasil (Sebrae, 2024).</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Plano -->
+  <section class="slide" id="slide-3" aria-roledescription="slide" aria-label="3 de 8: Plano seguido">
+    <div class="frame plan">
+      <header>
+        <p class="eyebrow">02 · Plano seguido</p>
+        <h2>Pesquisa aplicada com estudo de caso único</h2>
+      </header>
+      <div class="body">
+        <p class="lead">Objetivo: desenvolver o sistema com o responsável pela barbearia e medir como ele se comporta no uso real, incluindo os comandos em linguagem natural.</p>
+        <ol class="steps">
+          <li>
+            <h3>Levantamento</h3>
+            <p>Entrevista semiestruturada com 30 perguntas e observação da rotina do estabelecimento.</p>
+            <p class="result">27 RF · 9 RNF · 22 RN</p>
+          </li>
+          <li>
+            <h3>Modelagem</h3>
+            <p>Casos de uso, diagrama de classes e modelo entidade-relacionamento. Backend em camadas, segundo a Clean Architecture.</p>
+            <p class="result">4 camadas no backend</p>
+          </li>
+          <li>
+            <h3>Construção incremental</h3>
+            <p>Primeiro os cadastros, depois agendamentos e relatórios e, por último, o assistente em linguagem natural.</p>
+            <p class="result">3 incrementos verificáveis</p>
+          </li>
+          <li>
+            <h3>Avaliação</h3>
+            <p>Testes automatizados, 5 dias de processo manual contra 5 dias com o app, comandos em uso real e ensaio controlado.</p>
+            <p class="result">43 cenários × 3 execuções</p>
+          </li>
+        </ol>
+      </div>
+      <div class="foot">
+        <span>Kroma · Ariel M. Rodrigues · IFPR Paranavaí</span>
+        <span>Wohlin et al. (2012); Martin (2018)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Entrega: sistema -->
+  <section class="slide" id="slide-4" aria-roledescription="slide" aria-label="4 de 8: O que foi entregue">
+    <div class="frame system">
+      <header>
+        <p class="eyebrow">03 · O que foi entregue</p>
+        <h2>Aplicativo móvel e API com as regras do negócio</h2>
+      </header>
+      <div class="body">
+        <div class="phones">
+          <figure class="phone">
+            <img src="img/novo-agendamento.jpg" alt="Formulário de novo agendamento às 8h com Corte Masculino e Barba Completa, 50 minutos e 70 reais no total" width="600" height="1219">
+            <figcaption>Duração e valor somados pelos serviços escolhidos</figcaption>
+          </figure>
+          <figure class="phone">
+            <img src="img/servicos.jpg" alt="Lista de cinco serviços com duração e preço, como Corte Masculino de 30 minutos por 40 reais" width="600" height="1219">
+            <figcaption>Catálogo de serviços com preço e duração</figcaption>
+          </figure>
+          <figure class="phone">
+            <img src="img/relatorios.jpg" alt="Tela de relatórios com faturamento do dia, atendimentos na semana e no mês, ticket médio e perdas por cancelamento" width="600" height="1219">
+            <figcaption>Faturamento, atendimentos e perdas por cancelamento</figcaption>
+          </figure>
+        </div>
+        <div class="side">
+          <div>
+            <h3>Tecnologias</h3>
+            <ul class="tags">
+              <li>React Native</li><li>NestJS</li><li>TypeScript</li><li>MySQL</li><li>Prisma ORM</li><li>JWT</li><li>Jest</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Regras aplicadas na API</h3>
+            <ul class="list">
+              <li>Atendimentos de segunda a sábado, das 8h às 12h e das 13h15 às 19h30.</li>
+              <li>Nunca dois agendamentos no mesmo horário para o mesmo profissional.</li>
+              <li>No máximo 7 dias de antecedência.</li>
+              <li>Cancelamento com menos de 1 hora gera registro de cobrança.</li>
+              <li>Três perfis de acesso: Admin, Supervisor e Barber.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="foot">
+        <span>Kroma · Ariel M. Rodrigues · IFPR Paranavaí</span>
+        <span>Android e iOS a partir de uma única base de código</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Entrega: assistente -->
+  <section class="slide" id="slide-5" aria-roledescription="slide" aria-label="5 de 8: Assistente em linguagem natural">
+    <div class="frame assistant">
+      <header>
+        <p class="eyebrow">04 · O que foi entregue</p>
+        <h2>O assistente converte o pedido em uma chamada de função</h2>
+      </header>
+      <div class="body">
+        <div>
+          <ol class="flow">
+            <li><span><span class="who">App.</span> O usuário digita ou fala o pedido. O áudio é transcrito antes de seguir.</span></li>
+            <li><span><span class="who">API Kroma.</span> Envia o texto e a declaração das 4 funções ao Gemini.</span></li>
+            <li class="key"><span><span class="who">Modelo.</span> Escolhe a função e extrai os parâmetros, sem executar nada.</span></li>
+            <li class="key"><span><span class="who">Backend.</span> Executa o caso de uso com as mesmas validações da API REST.</span></li>
+            <li><span><span class="who">Modelo.</span> Redige a resposta que aparece no app.</span></li>
+          </ol>
+          <ul class="fns" aria-label="Funções disponíveis ao modelo">
+            <li><span class="mono">QUERY_SCHEDULE</span><span>consultar a agenda de um dia</span></li>
+            <li><span class="mono">CREATE_APPOINTMENT</span><span>criar agendamento</span></li>
+            <li><span class="mono">REGISTER_CLIENT</span><span>cadastrar cliente</span></li>
+            <li><span class="mono">GENERATE_REPORT</span><span>gerar relatório</span></li>
+          </ul>
+        </div>
+        <figure class="phone">
+          <img src="img/assistente.jpg" alt="Tela do assistente respondendo quais são os agendamentos de hoje, com a função QUERY_SCHEDULE, e gravando um novo comando por voz" width="600" height="1219">
+          <figcaption>“Quais são os agendamentos de hoje?”</figcaption>
+        </figure>
+      </div>
+      <p class="note"><strong>Nota de implementação.</strong> O resumo expandido descreve essa integração como MCP. A versão final usa a chamada de funções (<em>function calling</em>) da API Gemini, com o modelo gemini-3.1-flash-lite no plano gratuito. Excluir registros e trocar senha ficam fora do assistente.</p>
+    </div>
+  </section>
+
+  <!-- 6. Resultados: sistema -->
+  <section class="slide" id="slide-6" aria-roledescription="slide" aria-label="6 de 8: Resultados do sistema">
+    <div class="frame res1">
+      <header>
+        <p class="eyebrow">05 · Resultados</p>
+        <h2>Escopo entregue e testado</h2>
+      </header>
+      <div class="body">
+        <p class="section-label">Verificação técnica</p>
+        <div class="card">
+          <p class="stat-label">Requisitos funcionais implementados</p>
+          <p class="stat-value">27 <span class="unit">de 27</span></p>
+          <p class="stat-note">Conferidos contra a especificação validada com o dono.</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">Testes automatizados aprovados</p>
+          <p class="stat-value">127 <span class="unit">de 127</span></p>
+          <p class="stat-note">108 unitários e 19 de integração no backend.</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">Cobertura de instruções em domínio e casos de uso</p>
+          <p class="stat-value">52,8<span class="unit">%</span></p>
+          <p class="stat-note">78,3% nos arquivos com regras de negócio. Dias, horários e conflitos com 100%.</p>
+        </div>
+        <p class="section-label">Uso real · 5 dias com caderno, 5 dias com o app</p>
+        <div class="card">
+          <p class="stat-label">Tempo para registrar um agendamento</p>
+          <p class="stat-value">16,62 <span class="unit">s</span></p>
+          <p class="delta"><span class="arrow" aria-hidden="true">▼</span> 2,25 s a menos que no caderno (18,87 s), −11,9%</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">Agendamentos refeitos por troca de serviço</p>
+          <p class="stat-value">0 <span class="unit">contra 2 no caderno</span></p>
+          <p class="stat-note">Sem conflito de horário nem perda de dados nos dois períodos.</p>
+        </div>
+        <div class="card">
+          <p class="stat-label">Como ler esses números</p>
+          <p class="readme">Uma única rodada de cronometragem e volume de atendimentos não controlado. A comparação é exploratória.</p>
+        </div>
+      </div>
+      <div class="foot">
+        <span>Kroma · Ariel M. Rodrigues · IFPR Paranavaí</span>
+        <span>Jest 30.1.3 · Wohlin et al. (2012)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Resultados: assistente -->
+  <section class="slide" id="slide-7" aria-roledescription="slide" aria-label="7 de 8: Resultados do assistente">
+    <div class="frame res2">
+      <header>
+        <p class="eyebrow">06 · Resultados do assistente</p>
+        <h2>O assistente acerta quando o Gemini responde</h2>
+      </header>
+      <div class="body">
+        <div class="left">
+          <div class="card real">
+            <p class="stat-label">Uso real, comandos livres do dono</p>
+            <p class="stat-value">36 <span class="unit">de 50</span></p>
+            <p class="stat-note">72,0% de sucesso. Nos 40 comandos em que o Gemini respondeu, 90,0%.</p>
+          </div>
+          <div class="card">
+            <p class="stat-label">Destaques do ensaio controlado</p>
+            <ul class="takeaways">
+              <li><strong>92,7%</strong>de acerto quando o serviço respondeu</li>
+              <li><strong>19 de 19</strong>violações de regra barradas</li>
+              <li><strong>89 de 126</strong>certas e com resposta completa</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card bar-wrap">
+          <p class="stat-label">Ensaio controlado: 42 cenários × 3 execuções = 126 execuções</p>
+          <div class="bar" role="img" aria-label="Desfechos das 126 execuções: 101 com comportamento esperado (80,2%), 8 erros de interpretação (6,3%), 17 falhas do serviço externo (13,5%)">
+            <span class="seg ok" tabindex="0" data-tip="Comportamento esperado: 101 (80,2%)">80,2%</span>
+            <span class="seg interp" tabindex="0" data-tip="Erros de interpretação: 8 (6,3%)"></span>
+            <span class="seg ext" tabindex="0" data-tip="Falha do serviço externo: 17 (13,5%)">13,5%</span>
+          </div>
+          <ul class="legend">
+            <li><span class="sw" style="background: var(--c-ok)"></span>Comportamento esperado</li>
+            <li><span class="sw" style="background: var(--c-interp)"></span>Erros de interpretação</li>
+            <li><span class="sw" style="background: var(--c-ext)"></span>Falha do serviço externo</li>
+          </ul>
+          <table class="data">
+            <thead><tr><th>Desfecho</th><th class="n">Execuções</th><th class="n">%</th></tr></thead>
+            <tbody>
+              <tr><td>Comportamento esperado</td><td class="n">101</td><td class="n">80,2</td></tr>
+              <tr><td>Erros de interpretação</td><td class="n">8</td><td class="n">6,3</td></tr>
+              <tr class="group"><td>Agendou sem o serviço informado, presumindo “corte”</td><td class="n">3</td><td class="n">2,4</td></tr>
+              <tr class="group"><td>Leu “semana passada” diferente do critério</td><td class="n">3</td><td class="n">2,4</td></tr>
+              <tr class="group"><td>Data com pontuação indevida, rejeitada pela API</td><td class="n">2</td><td class="n">1,6</td></tr>
+              <tr><td>Falha do serviço externo antes da função</td><td class="n">17</td><td class="n">13,5</td></tr>
+              <tr class="total"><td>Total</td><td class="n">126</td><td class="n">100,0</td></tr>
+            </tbody>
+          </table>
+          <p class="table-note">Em 12 das execuções certas, a segunda chamada ao modelo, que redige a resposta, expirou ou ficou indisponível. Nenhuma violação de regra gerou registro.</p>
+        </div>
+      </div>
+      <div class="foot">
+        <span>Kroma · Ariel M. Rodrigues · IFPR Paranavaí</span>
+        <span>gemini-3.1-flash-lite, plano gratuito</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Conclusão -->
+  <section class="slide" id="slide-8" aria-roledescription="slide" aria-label="8 de 8: Conclusão">
+    <div class="frame end">
+      <header>
+        <p class="eyebrow">07 · Conclusão</p>
+        <h2>O Kroma centralizou a gestão e o assistente funciona, com ressalvas</h2>
+      </header>
+      <div class="body">
+        <div class="card done">
+          <h3>Entregue</h3>
+          <ul class="list">
+            <li>Clientes, serviços, agenda e relatórios em um único aplicativo.</li>
+            <li>Operações por texto e voz que passam pelas mesmas regras do backend.</li>
+            <li>Todos os requisitos funcionais e testes automatizados aprovados.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Limites</h3>
+          <ul class="list">
+            <li>Um usuário, um estabelecimento e um modelo gratuito.</li>
+            <li>O dono achou os formulários mais práticos para agendar.</li>
+            <li>Canal de voz fora do ensaio controlado e custo de adoção não medido.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Próximos passos</h3>
+          <ul class="list">
+            <li>Pedir o dado ausente e confirmar antes de gravar.</li>
+            <li>Testar as regras ainda sem cobertura e avaliar a voz.</li>
+            <li>Uso por mais tempo e comparação entre modelos.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="closing">
+        <p class="thanks">Obrigado</p>
+        <div class="repos">
+          <a href="https://github.com/ArielMcR/Kroma">github.com/ArielMcR/Kroma</a>
+          <a href="https://github.com/ArielMcR/API_Kroma">github.com/ArielMcR/API_Kroma</a>
+          <span class="small">20230010210@estudantes.ifpr.edu.br</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+<nav class="hud" aria-label="Navegação da apresentação">
+  <span class="timer" id="timer" hidden aria-label="Tempo decorrido">0:00 / 5:00</span>
+  <button type="button" id="prev" aria-label="Slide anterior">←</button>
+  <span id="counter" aria-live="polite">1 / 8</span>
+  <button type="button" id="next" aria-label="Próximo slide">→</button>
+</nav>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress');
+  var timerEl = document.getElementById('timer');
+  var narrow = window.matchMedia('(max-width: 760px)');
+  var current = 0;
+  var startedAt = null;
+  var tick = null;
+
+  if (/overview/.test(location.search)) document.body.classList.add('overview');
+
+  function stacked() { return document.body.classList.contains('overview') || narrow.matches; }
+
+  function render() {
+    var isStacked = stacked();
+    slides.forEach(function (s, k) {
+      var on = k === current;
+      s.classList.toggle('is-active', on);
+      var hidden = !on && !isStacked;
+      s.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+      s.inert = hidden;
+    });
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+    progress.style.transform = 'scaleX(' + ((current + 1) / slides.length) + ')';
+  }
+
+  function go(n, fromHash) {
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    if (n > 0 && startedAt === null) startedAt = Date.now();
+    current = n;
+    render();
+    if (!fromHash) {
+      var h = '#slide-' + (n + 1);
+      if (location.hash !== h) { try { location.replace(h); } catch (e) {} }
+    }
+  }
+
+  function fromHash() {
+    var m = /^#slide-(\d+)$/.exec(location.hash);
+    if (m) go(parseInt(m[1], 10) - 1, true);
+  }
+
+  function fmt(ms) {
+    var s = Math.floor(ms / 1000);
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+  function updateTimer() {
+    var ms = startedAt === null ? 0 : Date.now() - startedAt;
+    timerEl.textContent = fmt(ms) + ' / 5:00';
+    timerEl.classList.toggle('over', ms > 5 * 60 * 1000);
+  }
+  function toggleTimer() {
+    timerEl.hidden = !timerEl.hidden;
+    if (!timerEl.hidden) { updateTimer(); tick = setInterval(updateTimer, 1000); }
+    else { clearInterval(tick); }
+  }
+  function toggleFullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (document.documentElement.requestFullscreen) {
+        var p = document.documentElement.requestFullscreen();
+        if (p && p.catch) p.catch(function () {});
+      }
+    } catch (e) {}
+  }
+  function toggleOverview() {
+    document.body.classList.toggle('overview');
+    render();
+    if (stacked()) slides[current].scrollIntoView({ block: 'start' });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ' || k === 'Enter') {
+      if (stacked() || (k === 'Enter' && e.target.closest && e.target.closest('a, button'))) return;
+      e.preventDefault(); go(current + 1);
+    } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || k === 'Backspace') {
+      if (stacked()) return;
+      e.preventDefault(); go(current - 1);
+    } else if (k === 'Home') { if (!stacked()) { e.preventDefault(); go(0); } }
+    else if (k === 'End') { if (!stacked()) { e.preventDefault(); go(slides.length - 1); } }
+    else if (k === 'f' || k === 'F') { toggleFullscreen(); }
+    else if (k === 't' || k === 'T') { toggleTimer(); }
+    else if (k === 'o' || k === 'O' || k === 'Escape') {
+      if (k === 'Escape' && !document.body.classList.contains('overview')) return;
+      toggleOverview();
+    }
+  });
+
+  document.getElementById('prev').addEventListener('click', function () { go(current - 1); });
+  document.getElementById('next').addEventListener('click', function () { go(current + 1); });
+
+  slides.forEach(function (s, k) {
+    s.addEventListener('click', function (e) {
+      if (e.target.closest('a, button, .seg')) return;
+      if (document.body.classList.contains('overview')) {
+        document.body.classList.remove('overview');
+        go(k);
+        return;
+      }
+      if (narrow.matches) return;
+      go(current + 1);
+    });
+  });
+
+  var touchX = null;
+  document.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (touchX === null || stacked()) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) go(current + (dx < 0 ? 1 : -1));
+    touchX = null;
+  });
+
+  window.addEventListener('hashchange', fromHash);
+  if (narrow.addEventListener) narrow.addEventListener('change', render);
+  fromHash();
+  render();
+})();
+</script>
+</body>
+</html>
