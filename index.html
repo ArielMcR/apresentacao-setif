@@ -589,7 +589,7 @@
     }
 
     .assistant .phone {
-      --ph: calc(var(--u) * 520);
+      --ph: calc(var(--u) * 470);
     }
 
     .note {
@@ -954,7 +954,7 @@
       display: none;
     }
 
-    @media (max-width: 760px) {
+    @media screen and (max-width: 760px) {
       .deck {
         position: static;
         display: grid;
@@ -1049,25 +1049,47 @@
       }
     }
 
+    @page {
+      size: 1600px 900px;
+      margin: 0;
+    }
+
     @media print {
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        transition: none !important;
+      }
+
+      html,
       body {
-        background: #FFFFFF;
+        height: auto;
+        background: var(--paper);
       }
 
       .deck {
         position: static;
         display: block;
+        overflow: visible;
       }
 
       .slide {
         opacity: 1;
         visibility: visible;
-        width: 100%;
+        width: 1600px;
+        height: 900px;
+        aspect-ratio: auto;
+        overflow: hidden;
         break-after: page;
       }
 
+      .slide:last-child {
+        break-after: auto;
+      }
+
       .hud,
-      .progress {
+      .progress,
+      .keys {
         display: none;
       }
     }
@@ -1245,7 +1267,7 @@
       <div class="frame assistant">
         <header>
           <p class="eyebrow">04 · O que foi entregue</p>
-          <h2>O assistente converte o pedido em uma chamada de função</h2>
+          <h2>O pedido vira uma chamada de função</h2>
         </header>
         <div class="body">
           <div>
@@ -1479,7 +1501,7 @@
       var counter = document.getElementById('counter');
       var progress = document.getElementById('progress');
       var timerEl = document.getElementById('timer');
-      var narrow = window.matchMedia('(max-width: 760px)');
+      var narrow = window.matchMedia('screen and (max-width: 760px)');
       var current = 0;
       var startedAt = null;
       var tick = null;
