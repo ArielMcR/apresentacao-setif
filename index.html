@@ -113,8 +113,8 @@
       --fs-h: calc(var(--u) * 58);
       --fs-lead: calc(var(--u) * 30);
       --fs-body: calc(var(--u) * 25);
-      --fs-small: max(12px, calc(var(--u) * 19));
-      --fs-eyebrow: max(11px, calc(var(--u) * 18));
+      --fs-small: calc(var(--u) * 19);
+      --fs-eyebrow: calc(var(--u) * 18);
       --fs-stat: calc(var(--u) * 76);
       --pad-x: calc(var(--u) * 88);
       --pad-y: calc(var(--u) * 64);
@@ -954,7 +954,7 @@
       display: none;
     }
 
-    @media screen and (max-width: 760px) {
+    @media screen and (max-width: 760px) and (orientation: portrait) {
       .deck {
         position: static;
         display: grid;
@@ -979,6 +979,8 @@
         padding: 28px 18px;
         gap: 18px;
         --fs-hero: 84px;
+        --fs-small: 12px;
+        --fs-eyebrow: 11px;
       }
 
       .hud,
@@ -1501,7 +1503,7 @@
       var counter = document.getElementById('counter');
       var progress = document.getElementById('progress');
       var timerEl = document.getElementById('timer');
-      var narrow = window.matchMedia('screen and (max-width: 760px)');
+      var narrow = window.matchMedia('screen and (max-width: 760px) and (orientation: portrait)');
       var current = 0;
       var startedAt = null;
       var tick = null;
